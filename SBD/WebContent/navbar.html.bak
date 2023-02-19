@@ -1,0 +1,679 @@
+<div class="navbar">
+
+		<a id="homePage" href="#" onclick="recomendados()">
+			<img  style="width:50%; height:auto" src="photos/isel.png" alt="ISEL"/>
+		</a> 
+		
+		<a id="recommended" href="#" onclick="recomendados()" data-toggle="modal" data-target="#recommendedModal">
+		  	Recomendados
+		</a>
+		
+		<a id="popular" href="#" onclick="populares()" data-toggle="modal" data-target="#popularModal">
+		  	Populares 
+		</a>
+		
+		<a id="recent" href="#"  onclick="recentes()" data-toggle="modal" data-target="#recentModal">
+			Recentes
+		</a>
+
+		<a id="artist" href="#"  onclick="artistas()" data-toggle="modal" data-target="#artistsModal">
+			Artistas
+		</a>
+		
+		<div id="adminAndCriatorOnly">
+			
+		</div>
+		
+		<a>
+			<div class="input-group">
+				<div  class="dropdown" style="width:300px;" onkeyup="autocomplete()">
+	   				<input id="autocomplete" type="text" class="dropbtn" placeholder="Search"  value="">
+	   				<div id="droptitles" class="dropdown-content">
+	   				</div>
+	  			</div>
+				<button id="search" class="btn btn-outline-success my-2 my-sm-0" type="submit" href="#">Search</button>
+			</div>
+		</a>		
+		
+		<script>
+	
+		function autocomplete() {
+		
+			$.ajax({method: "POST", 
+				dataType: "json", 
+				data: {titulo: $("#autocomplete").val()}, 
+				url: "searchResource", 
+				error: function(xhr, status, error){
+		 				if(xhr.status == 500){
+		 					$.notify("O servidor estão offline");
+		 				}
+		 				//else
+		 				//	$.notify("Erro: " + xhr.responseText);	    
+		 		},
+				success: function(result){
+			  
+					console.log(result);
+					
+					$("#droptitles").empty();
+				
+					if ($("#autocomplete").val() == "") { return false;}
+			    					
+					const resources = result.data.split('|');		
+					
+					var $title = "";	
+					$.each(resources, function( key, val ) { 
+					  
+					  const info = val.split(', ');  
+					  $.each(info, function( key2, val2 ) {
+						  
+						  if (val2.includes("Titulo")) {
+							  $title = val2.split(' = ')[1];
+							  
+							  var $button = '<button class="x" value="' + $title + '">' + $title + '</button>'; 
+							  $("#droptitles").append($button);
+							  
+							  $(".x").click(function(){
+							  		document.getElementById("autocomplete").value = this.value;
+								    $("#droptitles").empty();
+								  
+							  });
+						  }
+					  });
+				});
+							
+		  }});
+		}
+		
+		
+		$("#search").click(function(){
+			
+			$.ajax({method: "POST", 
+				dataType: "json", 
+				data: {titulo: $("#autocomplete").val()}, 
+				url: "searchResource", 
+				error: function(xhr, status, error){
+		 				if(xhr.status == 500){
+		 					$.notify("O servidor estão offline");
+		 				}
+		 				//else
+		 				//	$.notify("Erro: " + xhr.responseText);	    
+		 		},
+				success: function(result){
+				  
+					presentResources(result);	
+			  }});
+			});
+		
+		</script>
+		
+		
+		
+		<script>
+		
+		function recomendados() {
+			
+			$.ajax({method: "POST", 
+				dataType: "json",
+				url: "searchRecommended", 
+				error: function(xhr, status, error){
+		 				if(xhr.status == 500){
+		 					$.notify("O servidor estão offline");
+		 					window.location.href = "http://localhost:8080/SBD/login.jsp";
+		 				}
+		 				else{
+		 					$.notify("Function Erro: " + xhr.responseText);	  
+		 				}
+		 		},
+				success: function(result){
+				  
+				console.log(result);
+				
+				if(result.errorType == "login") {
+					window.location.href = "http://localhost:8080/SBD/login.jsp";
+				}
+				else {
+					presentResources(result);					
+				}		
+			  }
+		 		});
+		}
+		
+		function populares() {
+			
+			$.ajax({method: "POST", 
+				dataType: "json",
+				url: "searchPopulars", 
+				error: function(xhr, status, error){
+		 				if(xhr.status == 500){
+		 					$.notify("O servidor estão offline");
+		 				}
+		 				else{
+		 					$.notify("Function Erro: " + xhr.responseText);	  
+		 				}
+		 		},
+				success: function(result){
+				  
+				console.log(result);
+				
+				if(result.errorType == "login") {
+					window.location.href = "http://localhost:8080/SBD/login.jsp";
+				}
+				else {
+					presentResources(result);					
+				}	
+			  }});
+		}	
+		
+		function recentes() {
+			
+			$.ajax({method: "POST", 
+				dataType: "json",
+				url: "searchRecents", 
+				error: function(xhr, status, error){
+		 				if(xhr.status == 500){
+		 					$.notify("O servidor estão offline");
+		 				}
+		 				else{
+		 					$.notify("Function Erro: " + xhr.responseText);	  
+		 				}
+		 		},
+				success: function(result){
+				  
+				console.log(result);
+				
+				if(result.errorType == "login") {
+					window.location.href = "http://localhost:8080/SBD/login.jsp";
+				}
+				else {
+					presentResources(result);					
+				}	
+			  }});
+		}
+		
+		function artistas() {
+			
+			$.ajax({method: "POST", 
+				dataType: "json",
+				url: "searchArtists", 
+				error: function(xhr, status, error){
+		 				if(xhr.status == 500){
+		 					$.notify("O servidor estão offline");
+		 				}
+		 				else{
+		 					$.notify("Function Erro: " + xhr.responseText);	  
+		 				}
+		 		},
+				success: function(result){
+				  
+				console.log(result);
+				
+				if(result.errorType == "login") {
+					window.location.href = "http://localhost:8080/SBD/login.jsp";
+				}
+				else {
+					presentArtists(result);					
+				}
+			  }});
+		}
+		
+		
+		</script>
+		
+		
+		
+		<script>
+		
+		
+		function presentResources(result) {
+			
+			$("#resourcesDiv").empty();
+			
+			const resources = result.data.split('|');
+			
+			var $index = 0;
+			var $idRow = 1;
+			var $idRes = 1;
+			
+			var $div = "";
+			var $row = "<div id='resourcesRow" + $idRow + "' class='row'>";
+			document.getElementById('resourcesDiv').innerHTML += $row;
+			
+			var $title = "";
+			var $publisher = "";
+			var $stars = "";
+			$.each(resources, function( key, val ) { 
+				
+				  const info = val.split(', ');  
+				  $.each(info, function( key2, val2 ) {
+					  
+					  if (val2.includes("Titulo")) {
+						  $title = val2.split(' = ')[1];
+						  
+					  } else if (val2.includes("carregado")) {
+						  $publisher = val2.split(' = ')[1];
+						
+					  } else if (val2.includes("classificacaoMedia")) {
+						  $stars = val2.split(' = ')[1].substring(0, val2.split(' = ')[1].length - 1);
+						  
+					  } else if (val2 == "") {
+						  $title = "";
+						  $publisher = "";
+						  $stars = "";
+					  }
+					  
+				  });
+				  
+				  if ($title != "") {
+					  
+					  $div = '<button onclick="buttonClick(this.value);" id="y' + $idRes + '" class="col-sm" value="' + 
+					  $title + ' | ' + $publisher + '" ' + 
+					  'style="background-color: #888888; margin: 30px; border-radius: 25px;"><h4>' + $title + '</h4>' +
+					  '<div id="showFotoHere' + $idRes + '"></div>' +
+					  '<h6> Publicado por ' + $publisher + '</h6></button>'; 
+					  $('#resourcesRow' + $idRow).append($div);
+				      
+				      if ($stars != "" && $stars != "0.0") {
+				    	  $div = '<div><img style="float:right; display:block; width:auto; height:17px;" ' +
+						  'src="photos/star.png" alt="STAR"/>' + 
+						  '<h6 style="float:right; display:block; position: relative; bottom: 10px; right: 5px;"> ' + $stars +
+						  '</h6></div>';
+				    	  $('#y' + $idRes).append($div);
+				      }
+				      
+				      showMiniature($("#showFotoHere" + $idRes), $title, $publisher, "Ilustracao", $idRes);
+				      $idRes++;
+			          
+			          $index++;
+					  if ($index % 4 == 0) {
+						    $row = "</div>";
+							document.getElementById('resourcesDiv').innerHTML += $row;
+							$idRow++;
+							var $row = "<div id='resourcesRow" + $idRow + "' class='row'>";
+							document.getElementById('resourcesDiv').innerHTML += $row;
+					  }
+				  }
+				  
+			  });
+			
+			
+			  while ($index % 4 != 0) {
+				  var $resource = "<div class='col-sm'></div>";
+		          document.getElementById('resourcesRow' + $idRow).innerHTML += $resource;
+		          $index++;
+			  }
+			
+			$row = "</div>";
+			document.getElementById('resourcesDiv').innerHTML += $row;
+			
+		}
+		
+		function buttonClick(x) {
+			const title = x.split(" | ")[0];
+			const publisher = x.split(" | ")[1];
+			const uri = "http://localhost:8080/SBD/showResource.jsp?title="+title+"&publisher="+publisher;
+			//const encodedURI = encodeURIComponent(uri);
+			//console.log(encodedURI);
+			window.location.href = uri;
+		}
+		
+		
+		</script>
+		
+		
+		
+		<script>
+		
+		
+		function presentArtists(result) {
+			
+			$("#resourcesDiv").empty();
+			
+			const resources = result.data.split('|');
+			
+			var $id = 1;
+			var $idImgR = 1;
+			var $idImgA = 1;
+			var $pastArtist = "";
+			
+			var $row = "<div id='divArtists" + $id + "' " + 
+				  "style='background-color: rgba(136, 136, 136, 0.9); margin: 30px; padding: 15px; border-radius: 25px;" + 
+				  " justify-content: center;'>";
+			document.getElementById('resourcesDiv').innerHTML += $row; 
+			
+			var $artist = "";
+			var $job = "";
+			var $titleR = "";
+			var $userR = "";
+			var $type = "";
+			$.each(resources, function( key, val ) { 
+				
+				  const info = val.split(', ');  
+				  $.each(info, function( key2, val2 ) {
+					  
+					  if (val2.includes("Artista")) {
+						  $artist = val2.split(' = ')[1];
+						  
+					  } else if (val2.includes("profissao")) {
+						  $job = val2.split(' = ')[1];
+					  
+					  } else if (val2.includes("tituloRecurso")) {
+						  $titleR = val2.split(' = ')[1];
+						  
+					  } else if (val2.includes("utilizadorRecurso")) {
+						  $userR = val2.split(' = ')[1];
+						  
+					  } else if (val2.includes("tipo")) {
+						  $type = val2.split(' = ')[1];
+						  
+					  } else if (val2 == "") {
+						  $artist = "";
+						  $job = "";
+						  $titleR = "";
+						  $userR = "";
+						  $pastArtist = "";
+						  $type = "";
+					  }
+					  
+				  });
+				  
+				  if ($artist != "") {
+					  
+					  if ($pastArtist != "" && $artist != $pastArtist) {
+						    $row = "</div>";
+							document.getElementById('resourcesDiv').innerHTML += $row;
+							$pastArtist = $artist;
+							$id++;
+							var $row = "<div id='divArtists" + $id + "' " + 
+							  "style='background-color: rgba(136, 136, 136, 0.9); margin: 30px; padding: 15px; border-radius: 25px;" + 
+							  " justify-content: center;'>";
+							  document.getElementById('resourcesDiv').innerHTML += $row;
+					  }
+					  else { $pastArtist = $artist; }
+					  
+					  var $div = '<button onclick="buttonClick(this.value);" class="row" value="' + $titleR + ' | ' + $userR + '" ' + 
+					  'style="background-color: #AAAAAA; margin: 30px; border-radius: 25px; width:93%;">' + 
+					  
+					  '<div class="col-sm"><h4>' + $titleR + '</h4><div id="showResourceImg' + $idImgR + '"></div>' + 
+					  '<h6><strong>' + $type + '</strong> por ' + $userR + '</h6></div> ' + 
+					  //'<div class="col-sm"></div> ' + 
+					  '<div class="col-sm"><h4>' + $job + '</h4><div id="showArtistImg' + $idImgA + '"></div>' + 
+					  '<h6> ' + $artist + '</h6></div></button>'; 
+				
+					  $("#divArtists" + $id + "").append($div);
+					  
+					  showMiniature($("#showResourceImg" + $idImgR), $titleR, $userR, "Ilustracao", $idImgR);
+				      $idImgR++;
+				      showArtistMiniature($("#showArtistImg" + $idImgA), $artist, $idImgA);
+					  $idImgA++;
+				  }
+				  
+			  });
+			
+			$row = "</div>";
+			document.getElementById('resourcesDiv').innerHTML += $row;
+			
+		}
+		
+		</script>
+		
+		<script>
+	
+			function isAdmin() {
+				$.ajax({dataType: "json", 
+					  url: "verifyUser", 
+					  error: function(xhr, status, error){
+							if(xhr.status == 500){
+								$.notify("O servidor está offline");
+							}
+							//else
+			 				//	$.notify("Erro: " + xhr.responseText);	    
+					  },
+					  success: function(result){
+						  
+						  console.log("isAdmin");
+					  
+						  if (result.errorType == "login") {
+					  		window.location.href = "http://localhost:8080/SBD/login.jsp";
+					  		
+					  	  } else if (result.type == "convidado") {
+					  		window.location.href = "http://localhost:8080/SBD/homePage1.jsp";
+					  		
+					  	  } else if (result.type == "criador") {
+						  		window.location.href = "http://localhost:8080/SBD/homePage2.jsp";
+						  		
+					  	  } else if (result.type == "admin") {
+					  		var $buttonC = '<a id="upload" href="#"  data-toggle="modal" data-target="#exportModal">' +	
+							'<label for="file-input"><i class="fa fa-fw fa-cloud-upload"></i>Criar Recurso' + 
+							'</label><input id="file-input" type="file" accept="text/xml"' +
+							'style="display: none;" onchange="this.form.submit();"/></a>';
+							$("#adminAndCriatorOnly").append($buttonC);
+					  	  }
+					  }
+					});
+				}
+	
+			function isCriador() {
+				$.ajax({dataType: "json", 
+					  url: "verifyUser", 
+					  error: function(xhr, status, error){
+							if(xhr.status == 500){
+								$.notify("O servidor está offline");
+							}
+							//else
+			 				//	$.notify("Erro: " + xhr.responseText);	    
+					  },
+					  success: function(result){
+						  
+						  console.log("isCriador");
+					  
+						  if (result.errorType == "login") {
+					  		window.location.href = "http://localhost:8080/SBD/login.jsp";
+					  		
+					  	  } else if (result.type == "convidado") {
+					  		window.location.href = "http://localhost:8080/SBD/homePage1.jsp";
+					  		
+					  	  } else if (result.type == "admin") {
+					  		  var $button = '<button onclick="returnToAdmin()" type="button" class="btn btn-danger btn-sm" ' + 
+					  		  'style="position: absolute; bottom: 5px; right: 5px;"> Administração </button>';
+						  	  $("#adminReturn").append($button);
+						  	  
+						  	var $buttonC = '<a id="upload" href="#" data-toggle="modal" data-target="#exportModal">' +
+							'<label for="file-input"><i class="fa fa-fw fa-cloud-upload"></i>Criar Recurso' + 
+							'</label><input id="file-input" type="file" accept="text/xml"' +
+							'style="display: none;" onchange="this.form.submit();"/></a>';
+							$("#adminAndCriatorOnly").append($buttonC);
+							
+					  	  } else if (result.type == "criador") {
+						  	  
+						  	var $buttonC = '<a id="upload" href="#" data-toggle="modal" data-target="#exportModal">' +
+						    '<label for="file-input"><i class="fa fa-fw fa-cloud-upload"></i>Criar Recurso' + 
+							'</label><input id="file-input" type="file" accept="text/xml"' +
+							'style="display: none;" onchange="this.form.submit();"/></a>';
+							$("#adminAndCriatorOnly").append($buttonC);
+					  	  } 
+					  }
+					});
+				}
+			
+			function returnToAdmin() {
+				window.location.href = "http://localhost:8080/SBD/homePage3.jsp";
+			}
+			
+			function isConvidado() {
+				$.ajax({dataType: "json", 
+					  url: "verifyUser", 
+					  error: function(xhr, status, error){
+							if(xhr.status == 500){
+								$.notify("O servidor está offline");
+							}
+							//else
+			 				//	$.notify("Erro: " + xhr.responseText);	    
+					  },
+					  success: function(result){
+						  
+						  console.log("isAdmin");
+					  
+						  if (result.errorType == "login") {
+					  		window.location.href = "http://localhost:8080/SBD/login.jsp";
+					  		
+					  	  } else if (result.type == "criador") {
+						  		window.location.href = "http://localhost:8080/SBD/homePage2.jsp";
+						  		
+					  	  } else if (result.type == "admin") {
+					  		  var $button = '<button onclick="returnToAdmin()" type="button" class="btn btn-danger btn-sm" ' + 
+					  		  'style="position: absolute; bottom: 5px; right: 5px;"> Administração </button>';
+						  	  $("#adminReturn").append($button);
+					  	  } 
+					  }
+					});
+				}
+		</script>
+		
+		<script>
+		// funcoes em comum para evitar repeticao
+		
+		function meusRecursos() {
+			
+			$.ajax({method: "POST", 
+				dataType: "json", 
+				url: "getUserResources", 
+				 error: function(xhr, status, error){
+						if(xhr.status == 500){
+							$.notify("O servidor está offline");
+						}
+						//else
+		 				//	$.notify("Erro: " + xhr.responseText);	    
+				  },
+				success: function(result){
+				 	
+					presentResources(result);
+				}
+					
+			 });
+		};
+		
+	</script>
+		
+	<script>
+		
+	function showMiniature($localParaMostrar, tituloRecurso, criadorRecurso, tipoRecurso, id) {
+		
+		var titulo = encodeURIComponent(tituloRecurso);
+		var carregadoPor = encodeURIComponent(criadorRecurso);
+		var tipoRecurso = encodeURIComponent(tipoRecurso);
+		
+		$miniature = "<img id='miniature" + id + "' style='object-fit: cover;' src='showResource?titulo="+titulo+
+				"&carregadoPor="+carregadoPor+"&tipoRecurso="+tipoRecurso+"'>";
+		
+		$localParaMostrar.append($miniature);
+		
+		$("#miniature" + id).css("width", 150);
+      	$("#miniature" + id).css("height", 150);
+	}
+	
+	function showArtistMiniature($localParaMostrar, nomeArtista, id) {
+		
+		var nomeArtista = encodeURIComponent(nomeArtista);
+		
+		$miniature = '<img id="miniatureArtist' + id + '" style="object-fit: cover;" src="showArtist?artista='+nomeArtista+'">';
+		
+		$localParaMostrar.append($miniature);
+		
+		$("#miniatureArtist" + id).css("width", 150);
+      	$("#miniatureArtist" + id).css("height", 150);
+	}
+		
+	</script>
+	
+	
+		<!-- Export Modal -->
+	<div class="modal" id="exportModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<!-- Modal Header -->
+				<div class="modal-header">
+					<h4 class="modal-title">Criar Recurso</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+
+				<!-- Modal body -->
+				<br> <br>
+				<form id="exportForm" action="addResource" method="post"
+					enctype="multipart/form-data" class="jquerySubmit">
+					
+					Título: 
+					<input type="text" name="título" value=""/> *
+					<br>
+					Resumo: 
+					<input type="text" name="resumo" value="" />
+					<br>
+					Faixa Etária: 
+					<input type="text" name="faixaEtária" value="" />
+					<br>
+					Tipo:
+					<select name="tipo" onchange="changeResource(value);">
+					<option value="" disabled selected></option>
+					<option value="poema">Poema</option>
+					<option value="filme">Filme</option>
+					<option value="fotografia">Fotografia</option>
+					<option value="música">Música</option>
+					</select>
+					
+					<script type="text/javascript">
+					
+					function changeResource(tipo){
+						if(tipo == "música" || tipo == "poema"){
+							
+							$recurso = $('#recurso');
+							$escritor='Escritor: <input type="text" name="escritor" value=""/> *';
+							
+							$recurso.append($escritor);
+
+						}
+						
+						if(tipo == "fotografia"){
+							
+							$recurso = $('#recurso');
+							$escritor='Fotógrafo: <input type="text" name="nomeFotógrafo" value=""/> *';
+							
+							$recurso.append($escritor);
+
+						}
+						
+						if(tipo == "filme"){
+							
+							$recurso = $('#recurso');
+							$escritor='Fotógrafo: <input type="text" name="nomeFotógrafo" value=""/> *';
+							$todo = "TODO";
+							
+							$recurso.append($escritor);
+							$recurso.append($todo);
+
+						}
+					}
+					
+					</script>
+					
+					<br>
+					Conteúdo: 
+					<input type="file" name="conteúdo"/> *
+					<br>
+					Ilustração: 
+					<input type="file" name="ilustração" accept="image/png, image/jpeg, image/jpg"/>
+					<br>
+					<div id="recurso"></div>
+					<br>
+					* - Obrigatório
+
+					<!-- Modal footer -->
+					<div class="modal-footer">
+						<input id="submitForm" type="submit" class="btn btn-primary" />
+						<button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+</div>
